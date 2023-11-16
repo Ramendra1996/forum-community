@@ -10,4 +10,8 @@ public class ForumCommunityApplication {
 		SpringApplication.run(ForumCommunityApplication.class, args);
 	}
 
+	/*@Bean
+	public PollOptions pollOptions() {
+		return new PollOptions();
+	}*/
 }

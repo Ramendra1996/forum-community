@@ -43,23 +43,13 @@ public class TopicService {
        allTopic.forEach(topic->{
            Optional<Category> category = categoryRepository.findById(topic.getCategoryId());
            topic.setCategoryName(category.get().getCategoryName());
-           topic.setPostCount(findAllTopicsWithPostCount().stream().count());
+
 
        });
        return allTopic;
    }
 //count funcation
-    public List<Topic> findAllTopicsWithPostCount() {
-        List<Object[]> results = topicRepository.findAllTopicsWithPostCount();
-        List<Topic> usersWithPostCounts = new ArrayList<>();
-        for (Object[] result : results) {
-            Topic topic = (Topic) result[0];
-            Long postCount = (Long) result[1];
-            topic.setPostCount(postCount);
-            usersWithPostCounts.add(topic);
-        }
-        return usersWithPostCounts;
-    }
+
 
 
 

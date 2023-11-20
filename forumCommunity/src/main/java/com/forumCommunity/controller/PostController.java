@@ -36,4 +36,10 @@ public class PostController {
     return new ResponseEntity<>(new BaseResponse(true,postService.getAllPost(page,size,sortBy,topicId,categoryId,userId)),HttpStatus.OK);
    }
 
+    @GetMapping("/all")
+   public ResponseEntity<BaseResponse> getAll(){
+        return new ResponseEntity<>(new BaseResponse(true,postService.getAll()),HttpStatus.OK);
+   }
+
+
 }

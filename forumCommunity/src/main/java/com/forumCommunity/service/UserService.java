@@ -1,11 +1,15 @@
 package com.forumCommunity.service;
 
+import com.forumCommunity.entity.Image;
 import com.forumCommunity.entity.User;
 import com.forumCommunity.exception.ForumCommunityServiceException;
+import com.forumCommunity.model.ObjectType;
+import com.forumCommunity.repository.ImageRepository;
 import com.forumCommunity.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.List;
@@ -16,10 +20,24 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private FileService fileService;
+
+    @Autowired
+    private ImageRepository imageRepository;
     //create user
     public User createUser(User user) {
         user.setDateOfCreation(new Date());
         user.setDateOfModification(new Date());
+        if(user.getUserPic()!=null){
+            Image image= new Image();
+            User usrObj = userRepository.save(user);
+            String uploadFile = fileService.uploadFile(user.getUserPic());
+            image.setImageUrl(uploadFile);
+            image.setObjectType(ObjectType.USER);
+            image.setObjectId(usrObj.getUserId());
+            imageRepository.save(image);
+        }
         return userRepository.save(user);
     }
 
@@ -60,4 +78,18 @@ public class UserService {
         userRepository.deleteById(userId);
         return "user delete";
     }
+
+/*    public MultipartFile convertStringToMultipartFile(String content) {
+        try {
+            // Convert the String content to a byte array using a specific character encoding
+            byte[] contentBytes = content.getBytes("UTF-8");
+
+            // Create a MockMultipartFile with the byte array, a default filename, and a default content type
+            return new MockMultipartFile("file", "default.txt", "text/plain", contentBytes);
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Handle the exception appropriately (e.g., log, throw custom exception)
+            return null; // or throw an exception, depending on your error handling strategy
+        }
+    }*/
 }

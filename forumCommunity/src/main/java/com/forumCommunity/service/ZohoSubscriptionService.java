@@ -1,7 +1,8 @@
 package com.forumCommunity.service;
 
-public class ZohoSubscriptionService {
-/*
+
+/*public class ZohoSubscriptionService {
+
     Logger logger = LoggerFactory.getLogger(ZohoSubscriptionService.class);
 
     @Autowired
@@ -671,5 +672,5 @@ public class ZohoSubscriptionService {
         this.zohoSessionDetails.setTimeStamp(new Date());
         this.zohoSessionDetailsRepository.save(this.zohoSessionDetails);
         return "SUCCESS";
-    }*/
-}
+    }
+}*/

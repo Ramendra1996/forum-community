@@ -1,5 +1,6 @@
 package com.forumCommunity.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.forumCommunity.entity.Post;
 import com.forumCommunity.model.BaseResponse;
 import com.forumCommunity.service.PostService;
@@ -40,6 +41,9 @@ public class PostController {
    public ResponseEntity<BaseResponse> getAll(){
         return new ResponseEntity<>(new BaseResponse(true,postService.getAll()),HttpStatus.OK);
    }
-
+    @GetMapping("topgainer")
+   public ResponseEntity<BaseResponse> getAllTopGainer() throws JsonProcessingException {
+        return new ResponseEntity<>(new BaseResponse(true,postService.getAllTopGainer()),HttpStatus.OK);
+   }
 
 }

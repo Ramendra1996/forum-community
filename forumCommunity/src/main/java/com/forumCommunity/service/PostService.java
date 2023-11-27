@@ -1,29 +1,30 @@
 package com.forumCommunity.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.forumCommunity.entity.Category;
 import com.forumCommunity.entity.Post;
 import com.forumCommunity.entity.Topic;
 import com.forumCommunity.entity.User;
 import com.forumCommunity.exception.ForumCommunityServiceException;
-import com.forumCommunity.model.EnumStatus;
-import com.forumCommunity.model.PostResponse;
-import com.forumCommunity.model.Repost;
+import com.forumCommunity.model.*;
 import com.forumCommunity.repository.*;
+import com.sun.net.httpserver.Headers;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.*;
 
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PostService {
@@ -40,6 +41,11 @@ public class PostService {
     private LikesRepository likesRepository;
     @Autowired
     private CommentRepository commentRepository;
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
 
     public Post createPost(Post post){
@@ -107,6 +113,71 @@ public class PostService {
          return m;
      }
 
+     /* public TopGainer getAllTopGainer() throws JsonProcessingException {
+        TopGainer topGainer = new TopGainer();
 
+          ResponseEntity<String> exchange = restTemplate.exchange("https://intradayscreener.com/api/trackStocks/cash", HttpMethod.GET, new HttpEntity<>(new Headers()), String.class);
+          String s = exchange.getBody();
+          JSONObject jsonObject = new JSONObject(s);
 
+          topGainer.setSymbol(jsonObject.getString("symbol"));
+          topGainer.setLtp(jsonObject.getLong("ltp"));
+          topGainer.setPriceChangePct(jsonObject.getLong("priceChangePct"));
+          topGainer.setOiChangePct(jsonObject.getLong("oiChangePct"));
+
+          // Add other properties if needed
+
+          // Finally, return the populated TopGainer object
+          return topGainer;
+
+      }*/
+
+    public TopGainer getAllTopGainer() {
+        ResponseEntity<String> exchange = restTemplate.exchange(
+                "https://intradayscreener.com/api/trackStocks/cash",
+                HttpMethod.GET,
+                new HttpEntity<>(new HttpHeaders()),
+                String.class
+        );
+
+        String responseBody = exchange.getBody();
+
+        if (responseBody != null) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode rootNode = objectMapper.readTree(responseBody);
+
+                // Assuming the topGainers array is nested under a key named "topGainers"
+                JsonNode topGainersNode = rootNode.get("topGainers");
+
+                // If topGainersNode is an array, you can iterate through it
+                List<TopGainerItem> topGainers = new ArrayList<>();
+                for (JsonNode topGainerNode : topGainersNode) {
+                    TopGainerItem topGainerItem = new TopGainerItem();
+                    topGainerItem.setSymbol(topGainerNode.get("symbol").asText());
+                    topGainerItem.setLtp(topGainerNode.get("ltp").asDouble());
+                    topGainerItem.setPriceChangePct(topGainerNode.get("priceChangePct").asDouble());
+                    topGainerItem.setOiChangePct(topGainerNode.get("oiChangePct").asDouble());
+
+                    // Add other properties if needed
+
+                    topGainers.add(topGainerItem);
+                }
+
+                // Set the list of topGainers in the TopGainer object
+                TopGainer topGainer = new TopGainer();
+                topGainer.setTopGainers(topGainers);
+
+                return topGainer;
+            } catch (Exception e) {
+                e.printStackTrace(); // Handle or log the exception as needed
+            }
+        }
+
+        // Handle the case where the response body is null or parsing fails
+        return null;
+    }
 }
+
+
+

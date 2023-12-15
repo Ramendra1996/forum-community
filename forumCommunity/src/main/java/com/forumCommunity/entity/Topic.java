@@ -21,6 +21,7 @@ public class Topic {
     @Transient
     private String categoryName;
 
+    @Transient
     private Long postCount;
 
 

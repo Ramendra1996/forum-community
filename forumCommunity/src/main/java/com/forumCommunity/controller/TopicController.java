@@ -38,6 +38,11 @@ public class TopicController {
     public ResponseEntity<BaseResponse> getAllTopic() {
         return new ResponseEntity<>(new BaseResponse(true, topicService.getAllTopic()), HttpStatus.OK);
     }
+    @GetMapping("{categoryId}")
+     public ResponseEntity<BaseResponse> getAllTopicByCategory(@PathVariable("categoryId")Long categoryId){
+        return  new ResponseEntity<>(new BaseResponse(true,topicService.getAllTopicByCategory(categoryId)),HttpStatus.OK);
+     }
+
 
    /* @PostMapping
     public ResponseEntity<List<Topic>>createTopic(@RequestBody List<String>topics){

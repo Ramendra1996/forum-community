@@ -4,15 +4,14 @@ import com.forumCommunity.entity.Category;
 import com.forumCommunity.entity.Topic;
 import com.forumCommunity.exception.ForumCommunityServiceException;
 import com.forumCommunity.repository.CategoryRepository;
+import com.forumCommunity.repository.PostRepository;
 import com.forumCommunity.repository.TopicRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TopicService {
@@ -21,6 +20,9 @@ public class TopicService {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private PostRepository postRepository;
 //create topic
     public Topic createTopic(Topic topic){
         topic.setDateOfCreation(new Date());
@@ -39,15 +41,41 @@ public class TopicService {
     }
 //get All topic
    public List<Topic> getAllTopic(){
-       List<Topic> allTopic = topicRepository.findAll();
-       allTopic.forEach(topic->{
-           Optional<Category> category = categoryRepository.findById(topic.getCategoryId());
-           topic.setCategoryName(category.get().getCategoryName());
-
-
-       });
-       return allTopic;
+       List<Object[]> topicsWithData = topicRepository.findAllTopicsWithCategoryAndPostCount();
+       List<Topic> allTopics = new ArrayList<>();
+       for (Object[] result : topicsWithData) {
+           Topic topic = (Topic) result[0];
+           String categoryName = (String) result[1];
+           Long postCount = (Long) result[2];
+           topic.setCategoryName(categoryName);
+           topic.setPostCount(postCount);
+           allTopics.add(topic);
+       }
+       allTopics.sort(Comparator.comparing(Topic::getTopicName));
+       return allTopics;
    }
+
+    public List<Topic> getAllTopicByCategory(Long categoryId) {
+        List<Topic> allTopic = topicRepository.findByCategoryId(categoryId);
+            List<Object[]> postCountResults = postRepository.countPostByTopicIds(
+                    allTopic.stream()
+                            .map(Topic::getTopicId)
+                            .collect(Collectors.toList())
+            );
+            Map<Long, Long> postCountMap = postCountResults.stream()
+                    .collect(Collectors.toMap(
+                            result -> (Long) result[0],
+                            result -> (Long) result[1]
+                    ));
+        Optional<Category> category = categoryRepository.findById(categoryId);
+                allTopic.forEach(topic -> {
+                    topic.setCategoryName(category.get().getCategoryName());
+                    topic.setPostCount(postCountMap.getOrDefault(topic.getTopicId(), 0L));
+                });
+        return allTopic;
+    }
+
+}
 //count funcation
 
 
@@ -63,4 +91,4 @@ public class TopicService {
         return  topicRepository.saveAll(topics);
     }*/
 
-}
+

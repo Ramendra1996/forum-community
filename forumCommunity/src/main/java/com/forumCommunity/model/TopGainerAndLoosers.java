@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TopGainer {
-    List<Item>topGainer;
+public class TopGainerAndLoosers {
+    private List<Item> topGainers;
+    private List<Item> topLosers;
 }

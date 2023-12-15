@@ -4,11 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TopGainer {
-    List<Item>topGainer;
+public class Item {
+    private String symbol;
+    private Double ltp;
+    private Double priceChangePct;
+    private Double oiChangePct;
 }

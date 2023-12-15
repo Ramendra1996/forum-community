@@ -3,6 +3,11 @@ server:
     context-path: /api/forumcommunity
   port: 8765
 spring:
+  cache:
+    cache-name: post
+    caffeine:
+      spec: maximumSize=500, expireAfterAccess=60m
+
   servlet:
     multipart:
       enabled: true
